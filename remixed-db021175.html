@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Health Check | Zarqen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f8f9ff;
+            --bg-card: #ffffff;
+            --bg-glow: #e8eaff;
+            --text: #1a1a2e;
+            --text-dim: #5a5a7a;
+            --accent: #6366f1;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --border: #e5e7eb;
+            --shadow: rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header with glowing effect */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            color: var(--accent);
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+            50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.6); }
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--text), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Progress with celebration effects */
+        .progress-wrapper {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+            border: 2px solid var(--border);
+            box-shadow: 0 2px 8px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-wrapper.celebrate {
+            animation: celebrate 0.6s ease;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .progress-count {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-glow);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Question cards with hover effects */
+        .question {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.5s ease forwards;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .question.answered {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, var(--bg-card), rgba(16, 185, 129, 0.05));
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+        }
+
+        .question.answered::before {
+            content: '✓';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            animation: pop 0.3s ease;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .q-number {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: var(--bg);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .q-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .q-subtitle {
+            font-size: 15px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Interactive option cards */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            position: relative;
+        }
+
+        .option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .option label {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: var(--bg-glow);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option label:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .option input:checked + label {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.12);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .option input:checked + label::before {
+            opacity: 0.1;
+        }
+
+        .radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            z-index: 1;
+            background: white;
+        }
+
+        .option input:checked + label .radio {
+            border-color: var(--accent);
+            background: var(--accent);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .option input:checked + label .radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .option-content {
+            z-index: 1;
+            flex: 1;
+        }
+
+        .option-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .option-badge {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .option input:checked + label .option-badge {
+            color: var(--accent);
+        }
+
+        /* Submit button with pulse effect */
+        .submit-zone {
+            position: sticky;
+            bottom: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            margin-top: 50px;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hint {
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        /* Results with confetti effect */
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .score-hero {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+            border: 2px solid var(--accent);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .score-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .score-big {
+            font-size: 100px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-message {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-pink);
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-desc {
+            font-size: 17px;
+            color: var(--text-dim);
+            max-width: 550px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Categories with animated bars */
+        .breakdown {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .breakdown-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        .category {
+            margin-bottom: 32px;
+        }
+
+        .cat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .cat-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .cat-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .cat-bar {
+            height: 12px;
+            background: var(--bg-glow);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .cat-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cat-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: slide 2s infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .gaps {
+            padding-left: 20px;
+        }
+
+        .gap-item {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .gap-item::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-purple);
+        }
+
+        /* CTA with glow effect */
+        .cta {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px solid var(--accent);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cta-desc {
+            font-size: 18px;
+            color: var(--text-dim);
+            margin-bottom: 36px;
+            line-height: 1.6;
+        }
+
+        .cta-footer {
+            margin-top: 28px;
+            font-size: 14px;
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 40px; }
+            .stats { gap: 24px; }
+            .question { padding: 24px; }
+            .score-big { font-size: 72px; }
+            .cta-title { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <div class="hero">
+            <div class="logo">⚡ ZARQEN</div>
+            <h1>Security Health Check</h1>
+            <p class="subtitle">10 quick questions to see if you're enterprise-ready (or about to get roasted in procurement)</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">10</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">~5</div>
+                    <div class="stat-label">Minutes</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Insights</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz">
+            <div class="progress-wrapper" id="progressWrapper">
+                <div class="progress-top">
+                    <span class="progress-text">Progress</span>
+                    <span class="progress-count" id="progressCount">0/10</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Questions will be inserted here by JavaScript -->
+            <div id="questionsContainer"></div>
+
+            <div class="submit-zone">
+                <button class="btn" id="submitBtn" disabled>
+                    <span>🚀 Show Me My Score</span>
+                </button>
+                <p class="hint" id="hint">Answer all questions to unlock your results</p>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <!-- Results generated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                id: 'q1',
+                number: 'Q1',
+                title: 'Who owns security at your company?',
+                subtitle: 'Is there someone whose job is to worry about this stuff?',
+                options: [
+                    { value: 'yes', label: 'Yes - We have a security owner', badge: '✓ Enterprise Ready' },
+                    { value: 'no', label: 'No - It\'s kind of everyone\'s problem', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q2',
+                number: 'Q2',
+                title: 'Do you have written security policies?',
+                subtitle: 'Actual documents, not just "we should probably do that"',
+                options: [
+                    { value: 'yes', label: 'Yes - All documented and approved', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Partial - Working on it', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - It\'s all tribal knowledge', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q3',
+                number: 'Q3',
+                title: 'Is access to sensitive data restricted?',
+                subtitle: 'Can everyone see everything, or do you actually control who sees what?',
+                options: [
+                    { value: 'yes', label: 'Yes - Role-based with regular reviews', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Partial - Some restrictions exist', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - Pretty open access', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q4',
+                number: 'Q4',
+                title: 'Is MFA enforced everywhere?',
+                subtitle: 'Email, admin panels, production systems... the works?',
+                options: [
+                    { value: 'yes', label: 'Everywhere - No exceptions', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Some systems - Working on full coverage', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'Not enforced - It\'s optional', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q5',
+                number: 'Q5',
+                title: 'Do you track and patch vulnerabilities?',
+                subtitle: 'When Log4j hits, do you have a plan or panic?',
+                options: [
+                    { value: 'yes', label: 'Yes - Documented patch process', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Informal - We handle it but it\'s ad-hoc', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - We patch when we remember', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q6',
+                number: 'Q6',
+                title: 'Can you detect and respond to incidents?',
+                subtitle: 'If something goes wrong, do you have a playbook?',
+                options: [
+                    { value: 'yes', label: 'Yes - Documented and tested plan', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Partial - We have a draft plan', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - We\'ll figure it out when it happens', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q7',
+                number: 'Q7',
+                title: 'Do you review your vendors for security?',
+                subtitle: 'AWS, Stripe, random SaaS tools... do you check them?',
+                options: [
+                    { value: 'yes', label: 'Yes - Formal vendor review process', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Informal - We ask questions sometimes', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - We trust the brand name', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q8',
+                number: 'Q8',
+                title: 'Is your data encrypted?',
+                subtitle: 'In transit (HTTPS) and at rest (database encryption)?',
+                options: [
+                    { value: 'yes', label: 'Yes - Everything encrypted', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Unsure - Probably but not verified', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - Not consistently', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q9',
+                number: 'Q9',
+                title: 'Do you keep security logs?',
+                subtitle: 'Can you see who did what, when, and from where?',
+                options: [
+                    { value: 'yes', label: 'Yes - Comprehensive logging', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Limited - Some logging exists', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - Minimal or no logging', badge: '⚠ Red Flag' }
+                ]
+            },
+            {
+                id: 'q10',
+                number: 'Q10',
+                title: 'Do you have a compliance roadmap?',
+                subtitle: 'SOC 2, ISO 27001... is it on the roadmap or wishlist?',
+                options: [
+                    { value: 'yes', label: 'Yes - Clear plan with timeline', badge: '✓ Enterprise Ready' },
+                    { value: 'partial', label: 'Considering - On the radar', badge: '⚡ In Progress' },
+                    { value: 'no', label: 'No - Not yet', badge: '⚠ Red Flag' }
+                ]
+            }
+        ];
+
+        const scoreMap = { 'yes': 10, 'partial': 5, 'no': 0 };
+        const answers = {};
+        const categoryMap = {
+            'Governance & Ownership': ['q1', 'q2', 'q10'],
+            'Access & Authentication': ['q3', 'q4'],
+            'Operations & Response': ['q5', 'q6', 'q9'],
+            'Data Protection': ['q8'],
+            'Third-Party Risk': ['q7']
+        };
+        const gapMap = {
+            'q1': 'No security owner - buyers see this as a major red flag',
+            'q2': 'Missing policies - required for any compliance certification',
+            'q3': 'Unrestricted access - violates least privilege principle',
+            'q4': 'No MFA enforcement - #1 cause of account takeovers',
+            'q5': 'No patch management - leaves you vulnerable to known exploits',
+            'q6': 'No incident plan - you\'re flying blind when breaches happen',
+            'q7': 'No vendor reviews - inheriting your vendors\' security problems',
+            'q8': 'Encryption gaps - fails basic compliance requirements',
+            'q9': 'Insufficient logging - can\'t prove compliance or investigate incidents',
+            'q10': 'No roadmap - signals you\'re not serious about enterprise'
+        };
+
+        // Render questions
+        const container = document.getElementById('questionsContainer');
+        quizData.forEach((q, idx) => {
+            const questionHTML = `
+                <div class="question" id="${q.id}" style="animation-delay: ${idx * 0.05}s;">
+                    <div class="q-number">${q.number}</div>
+                    <div class="q-title">${q.title}</div>
+                    <div class="q-subtitle">${q.subtitle}</div>
+                    <div class="options">
+                        ${q.options.map(opt => `
+                            <div class="option">
+                                <input type="radio" name="${q.id}" value="${opt.value}" id="${q.id}-${opt.value}">
+                                <label for="${q.id}-${opt.value}">
+                                    <div class="radio"></div>
+                                    <div class="option-content">
+                                        <div class="option-label">${opt.label}</div>
+                                        <div class="option-badge">${opt.badge}</div>
+                                    </div>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += questionHTML;
+        });
+
+        // Track answers
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const qId = this.name;
+                answers[qId] = this.value;
+                
+                // Mark question as answered
+                document.getElementById(qId).classList.add('answered');
+                
+                // Celebrate progress
+                const progressWrapper = document.getElementById('progressWrapper');
+                progressWrapper.classList.add('celebrate');
+                setTimeout(() => progressWrapper.classList.remove('celebrate'), 600);
+                
+                updateProgress();
+                checkCompletion();
+            });
+        });
+
+        function updateProgress() {
+            const answered = Object.keys(answers).length;
+            const progress = (answered / quizData.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressCount').textContent = `${answered}/10`;
+        }
+
+        function checkCompletion() {
+            const submitBtn = document.getElementById('submitBtn');
+            const hint = document.getElementById('hint');
+            
+            if (Object.keys(answers).length === quizData.length) {
+                submitBtn.disabled = false;
+                hint.textContent = '🎉 All done! Click to see your score';
+            } else {
+                const remaining = quizData.length - Object.keys(answers).length;
+                hint.textContent = `${remaining} question${remaining > 1 ? 's' : ''} left`;
+            }
+        }
+
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const totalScore = Object.values(answers).reduce((sum, val) => sum + scoreMap[val], 0);
+            
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('results').classList.add('show');
+            generateResults(totalScore);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        function generateResults(score) {
+            let emoji, message, subtitle, description;
+
+            if (score >= 80) {
+                emoji = '🔥';
+                message = 'Enterprise-Ready! Just Minor Gaps';
+                subtitle = '';
+                description = 'Your security game is strong. Enterprise buyers will love you. Just a few minor tweaks and you\'re golden.';
+            } else if (score >= 60) {
+                emoji = '💪';
+                message = 'Good Foundation, But Buyers Will Ask for More';
+                subtitle = '';
+                description = 'You\'re doing better than most startups. Close the gaps below and you\'ll sail through procurement.';
+            } else if (score >= 40) {
+                emoji = '⚠️';
+                message = 'Significant Gaps - Likely Delaying Deals';
+                subtitle = '(Deal Blockers Ahead)';
+                description = 'Enterprise buyers will hit pause on these gaps. Time to level up before your next big deal.';
+            } else {
+                emoji = '🚨';
+                message = 'High Risk - Procurement Will Pause Here';
+                subtitle = '(Deal Blockers Ahead)';
+                description = 'Your security posture will kill enterprise deals. The good news? These are all fixable. Let\'s get to work.';
+            }
+
+            // Calculate categories
+            const categoryScores = {};
+            const categoryGaps = {};
+            
+            Object.entries(categoryMap).forEach(([category, qs]) => {
+                const categoryTotal = qs.reduce((sum, q) => sum + scoreMap[answers[q]], 0);
+                const categoryMax = qs.length * 10;
+                categoryScores[category] = Math.round((categoryTotal / categoryMax) * 100);
+                categoryGaps[category] = qs.filter(q => scoreMap[answers[q]] < 10).map(q => gapMap[q]);
+            });
+
+            const resultsHTML = `
+                <div class="score-hero">
+                    <div class="score-label">Your Security Health Score</div>
+                    <div class="score-big">${score}<span style="font-size: 0.3em; opacity: 0.5;">/100</span></div>
+                    <div class="score-message">${emoji} ${message}</div>
+                    ${subtitle ? `<div class="score-subtitle">${subtitle}</div>` : ''}
+                    <p class="score-desc">${description}</p>
+                </div>
+
+                <div class="breakdown">
+                    <h2 class="breakdown-title">Category Breakdown</h2>
+                    ${Object.entries(categoryScores).map(([cat, catScore]) => `
+                        <div class="category">
+                            <div class="cat-header">
+                                <span class="cat-name">${cat}</span>
+                                <span class="cat-score" style="color: ${catScore >= 80 ? '#10b981' : catScore >= 50 ? '#f59e0b' : '#ef4444'}">${catScore}%</span>
+                            </div>
+                            <div class="cat-bar">
+                                <div class="cat-fill" style="width: ${catScore}%; background: ${catScore >= 80 ? 'linear-gradient(90deg, #10b981, #6366f1)' : catScore >= 50 ? 'linear-gradient(90deg, #f59e0b, #ec4899)' : 'linear-gradient(90deg, #ef4444, #ec4899)'}"></div>
+                            </div>
+                            ${categoryGaps[cat].length > 0 ? `
+                                <div class="gaps">
+                                    ${categoryGaps[cat].map(gap => `<div class="gap-item">${gap}</div>`).join('')}
+                                </div>
+                            ` : '<div class="gaps"><div class="gap-item" style="color: #10b981;">✓ All good here!</div></div>'}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="cta">
+                    <h2 class="cta-title">Want Help Fixing These?</h2>
+                    <p class="cta-desc">
+                        ${score >= 60 
+                            ? 'You\'re close to enterprise-ready. These gaps are fixable with the right approach.' 
+                            : 'Most startups have similar gaps. The key is knowing what to prioritize and how to fix it efficiently.'}
+                    </p>
+                    <div class="cta-footer">contact@zarqen.com | www.zarqen.com</div>
+                </div>
+            `;
+
+            document.getElementById('results').innerHTML = resultsHTML;
+
+            // Animate bars
+            setTimeout(() => {
+                document.querySelectorAll('.cat-fill').forEach(fill => {
+                    fill.style.width = fill.style.width;
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
